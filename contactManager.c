@@ -7,12 +7,14 @@
 #define MAX_USERNAME_LEN 50
 #define MAX_PASSWORD_LEN 50
 #define MAX_NAME_LEN 100
+#define MAX_EMAIL_LEN 150
 #define MAX_PHONE_LEN 20
 
 struct Contact
 {
     char username[MAX_USERNAME_LEN];
     char name[MAX_NAME_LEN];
+    char email[MAX_EMAIL_LEN];
     char phoneNumber[MAX_PHONE_LEN];
 };
 
@@ -37,6 +39,10 @@ void addContact(struct Contact contacts[], int *count, const char *currentUserna
     getchar();
     fgets(newContact.name, sizeof(newContact.name), stdin);
     newContact.name[strcspn(newContact.name, "\n")] = '\0';
+
+    printf("Enter email: ");
+    fgets(newContact.email, sizeof(newContact.email), stdin);
+    newContact.email[strcspn(newContact.email, "\n")] = '\0';
 
     printf("Enter phone number: ");
     fgets(newContact.phoneNumber, sizeof(newContact.phoneNumber), stdin);
@@ -63,6 +69,7 @@ void viewContacts(const struct Contact contacts[], int count, const char *curren
         if (strcmp(currentUsername, contacts[i].username) == 0)
         {
             printf("%d. Name: %s\n", serialNumber, contacts[i].name);
+            printf("   Email: %s\n", contacts[i].email);
             printf("   Phone: %s\n", contacts[i].phoneNumber);
             serialNumber++;
         }
@@ -121,7 +128,7 @@ void saveContactsToFile(const struct Contact contacts[], int count)
 
     for (int i = 0; i < count; i++)
     {
-        fprintf(file, "%s,%s,%s\n", contacts[i].username, contacts[i].name, contacts[i].phoneNumber);
+        fprintf(file, "%s|%s|%s|%s\n", contacts[i].username, contacts[i].name, contacts[i].email, contacts[i].phoneNumber);
     }
 
     fclose(file);
@@ -137,7 +144,7 @@ void loadContactsFromFile(struct Contact contacts[], int *count)
 
     *count = 0;
 
-    while (*count < MAX_CONTACTS && fscanf(file, "%[^,],%[^,],%[^\n]\n", contacts[*count].username,
+    while (*count < MAX_CONTACTS && fscanf(file, "%[^,]|%[^,]|%[^,]|%[^\n]\n", contacts[*count].username,
                                            contacts[*count].name, contacts[*count].phoneNumber) != EOF)
     {
         (*count)++;
@@ -157,7 +164,7 @@ void saveUsersToFile(const struct User users[], int count)
 
     for (int i = 0; i < count; i++)
     {
-        fprintf(file, "%s,%s\n", users[i].username, users[i].password);
+        fprintf(file, "%s|%s\n", users[i].username, users[i].password);
     }
 
     fclose(file);
@@ -173,7 +180,7 @@ void loadUsersFromFile(struct User users[], int *count)
 
     *count = 0;
 
-    while (*count < MAX_USERS && fscanf(file, "%[^,],%[^\n]\n", users[*count].username, users[*count].password) != EOF)
+    while (*count < MAX_USERS && fscanf(file, "%[^,]|%[^\n]\n", users[*count].username, users[*count].password) != EOF)
     {
         (*count)++;
     }
@@ -203,7 +210,7 @@ int registerUser(struct User users[], int *userCount)
 
     struct User newUser;
 
-    printf("Enter a username: ");
+    printf("Enter an username: ");
     scanf("%s", newUser.username);
 
     if (findUserIndex(users, *userCount, newUser.username) != -1)
@@ -263,7 +270,7 @@ int main()
             printf("3. Delete Contact\n");
             printf("4. Logout\n");
         }
-        printf("5. Exit\n");
+        printf("0. Exit\n");
 
         if (loggedIn)
         {
@@ -288,6 +295,7 @@ int main()
                 if (loggedIn)
                 {
                     addContact(contacts, &contactCount, currentUser);
+                    saveContactsToFile(contacts, contactCount);
                 }
                 else
                 {
@@ -325,6 +333,7 @@ int main()
             {
                 viewContacts(contacts, contactCount, currentUser);
                 deleteContact(contacts, &contactCount, currentUser);
+                saveContactsToFile(contacts, contactCount);
             }
             else
             {
@@ -343,10 +352,8 @@ int main()
                 printf("You are not logged in.\n");
             }
             break;
-        case 5:
+        case 0:
             printf("Exiting Contact Manager. Goodbye!\n");
-            saveContactsToFile(contacts, contactCount);
-            saveUsersToFile(users, userCount);
             exit(0);
         default:
             printf("Invalid choice. Please try again.\n");
