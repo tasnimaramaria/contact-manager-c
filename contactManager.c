@@ -145,7 +145,7 @@ void loadContactsFromFile(struct Contact contacts[], int *count)
     *count = 0;
 
     while (*count < MAX_CONTACTS && fscanf(file, "%[^|]|%[^|]|%[^|]|%[^\n]\n", contacts[*count].username,
-                                           contacts[*count].name, contacts[*count].phoneNumber) != EOF)
+                                           contacts[*count].name, contacts[*count].email, contacts[*count].phoneNumber) != EOF)
     {
         (*count)++;
     }
