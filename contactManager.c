@@ -144,7 +144,7 @@ void loadContactsFromFile(struct Contact contacts[], int *count)
 
     *count = 0;
 
-    while (*count < MAX_CONTACTS && fscanf(file, "%[^,]|%[^,]|%[^,]|%[^\n]\n", contacts[*count].username,
+    while (*count < MAX_CONTACTS && fscanf(file, "%[^|]|%[^|]|%[^|]|%[^\n]\n", contacts[*count].username,
                                            contacts[*count].name, contacts[*count].phoneNumber) != EOF)
     {
         (*count)++;
@@ -180,7 +180,7 @@ void loadUsersFromFile(struct User users[], int *count)
 
     *count = 0;
 
-    while (*count < MAX_USERS && fscanf(file, "%[^,]|%[^\n]\n", users[*count].username, users[*count].password) != EOF)
+    while (*count < MAX_USERS && fscanf(file, "%[^|]|%[^\n]\n", users[*count].username, users[*count].password) != EOF)
     {
         (*count)++;
     }
